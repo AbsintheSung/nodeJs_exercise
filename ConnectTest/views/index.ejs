@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <label for="inputId">ID:</label>
+    <input type="text" id="inputId">
+    
+    <label for="inputName">姓名:</label>
+    <input type="text" id="inputName">
+    
+    <label for="inputAge">年齡:</label>
+    <input type="number" id="inputAge">
+    
+    <label for="inputEmail">電子信箱:</label>
+    <input type="text" id="inputEmail">
+    
+    <label for="inputCourse">授課內容:</label>
+    <input type="text" id="inputCourse">
+    <button type="button" class="add_btn">新增</button>
+
+    <hr>
+
+    <label for="updateId">ID:</label>
+    <input type="text" id="updateId">
+    
+    <label for="updateName">姓名:</label>
+    <input type="text" id="updateName">
+    
+    <label for="updateAge">年齡:</label>
+    <input type="number" id="updateAge">
+    <button type="button" class="update_btn">修改</button>
+
+    <hr>
+
+    <label for="deleteId">要刪除的ID:</label>
+    <input type="number" id="deleteId">
+    <button type="button" class="delete_btn">刪除</button>
+
+    <hr>
+    <div id="list"></div>
+
+
+    <script>
+        let list = document.querySelector('#list')
+        let add_btn = document.querySelector('.add_btn');
+        let update_btn = document.querySelector('.update_btn')
+        let delete_btn = document.querySelector('.delete_btn')
+        add_btn.addEventListener('click',createData);
+
+        axios.get('/teachers/information').then((res)=>{
+            console.log(res.data.results)
+            let dataList = res.data.results
+            let str=''
+            dataList.forEach((item)=>{
+                str+=`<div>ID: ${item.Id}，姓名: ${item.Name}，年齡: ${item.Age}</div>`
+            })
+            list.innerHTML = str
+        })
+
+
+        //Create
+        function createData(){
+            let newData={}
+            let inputId = document.querySelector('#inputId')
+            let inputName = document.querySelector('#inputName')
+            let inputAge = document.querySelector('#inputAge')
+            let inputEmail = document.querySelector('#inputEmail') 
+            let inputCourse = document.querySelector('#inputCourse')
+            newData.id=inputId.value
+            newData.name=inputName.value
+            newData.age=inputAge.value
+            newData.email=inputEmail.value
+            newData.course=inputCourse.value
+            axios.post('/teachers/insert',newData).then((response)=>{
+                if(response.status===200){
+                    // console.log(response.data)
+                }
+            }).catch((err)=>{
+                console.log(err)
+            })
+        }
+
+        //Update
+        update_btn.addEventListener('click',updateDate)
+        function updateDate(){
+            let updateData={}
+            let updateId = document.querySelector('#updateId')
+            let updateName = document.querySelector('#updateName')
+            let updateAge = document.querySelector('#updateAge')
+            updateData.id = updateId.value
+            updateData.name = updateName.value
+            updateData.age = updateAge.value
+            axios.patch('/teachers',updateData)
+            .then((response)=>{
+                if(response.status===200){
+                    console.log(response.data)
+                }
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+        }
+        //Delete
+        delete_btn.addEventListener('click',deleteData)
+        function deleteData(){
+            let deleteId = document.querySelector('#deleteId').value
+            axios.delete(`/teachers/${deleteId}`)
+            .then((response)=>{
+                if(response.status===204){
+                    console.log(response.data)
+                }
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+        }
+    </script>
+</body>
+</html>
